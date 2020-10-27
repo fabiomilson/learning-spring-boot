@@ -20,6 +20,7 @@ public class Kitchen extends AbstractEntity {
     @Column(name = COLUMN_ID)
     private int id;
 
+    @Getter
     @Column(name = COLUMN_NAME, nullable = false)
     private String name;
 
