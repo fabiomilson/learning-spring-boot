@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,6 +79,19 @@ public class ControllerKitchen {
             LOGGER.error("Update -> NoSuchElementException: ", e);
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Kitchen> delete(@PathVariable Integer id){
+        try {
+            Kitchen kitchen = repositoryKitchen.findById(id).get();
+            repositoryKitchen.delete(kitchen);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (DataIntegrityViolationException e) {
+            LOGGER.error("Update -> DataIntegrityViolationException: ", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
     }
 
 }
