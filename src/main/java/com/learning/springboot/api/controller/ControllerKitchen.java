@@ -4,9 +4,14 @@ package com.learning.springboot.api.controller;
 import com.learning.springboot.domain.model.Kitchen;
 import com.learning.springboot.domain.model.XmlWrapperKitchen;
 import com.learning.springboot.domain.repository.RepositoryKitchen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 //@Controller
 //@ResponseBody
@@ -15,29 +20,30 @@ import org.springframework.web.bind.annotation.*;
 public class ControllerKitchen {
 
     private static final String DEFAULT_PATH = "/kitchens";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControllerKitchen.class);
 
     @Autowired
     private RepositoryKitchen repositoryKitchen;
 
     @GetMapping
-    public Iterable<Kitchen> findAll(){
+    public Iterable<Kitchen> findAll() {
         return repositoryKitchen.findAll();
     }
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
-    public XmlWrapperKitchen findAllXml(){
+    public XmlWrapperKitchen findAllXml() {
         return new XmlWrapperKitchen(repositoryKitchen.findAll());
     }
 
     /**
      * Example response with entity using from my model
-     * @GetMapping("/{id}")
-     * public Kitchen findById(@PathVariable("id") Integer id){
-     *   return repositoryKitchen.findById(id).orElseGet(() -> null);}
+     *
+     * @GetMapping("/{id}") public Kitchen findById(@PathVariable("id") Integer id){
+     * return repositoryKitchen.findById(id).orElseGet(() -> null);}
      **/
 
     @GetMapping("/{id}")
-    public ResponseEntity<Kitchen> findById(@PathVariable("id") Integer id){
+    public ResponseEntity<Kitchen> findById(@PathVariable("id") Integer id) {
         var kitchen = repositoryKitchen.findById(id).orElseGet(() -> null);
 
         //return ResponseEntity.status(HttpStatus.OK).body(kitchen);
@@ -47,7 +53,7 @@ public class ControllerKitchen {
         headers.add(HttpHeaders.LOCATION, "http://api.learning.springboot.local:8080/kitchens");
         return ResponseEntity.status(HttpStatus.FOUND).headers(headers).body(kitchen);*/
 
-        if(kitchen != null) {
+        if (kitchen != null) {
             return ResponseEntity.ok(kitchen);
         }
 
@@ -57,7 +63,21 @@ public class ControllerKitchen {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Kitchen add(@RequestBody Kitchen kitchen){
+    public Kitchen add(@RequestBody Kitchen kitchen) {
         return repositoryKitchen.save(kitchen);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Kitchen> update(@PathVariable Integer id, @RequestBody Kitchen kitchen) {
+        try {
+            Kitchen kitchenFromRepository = repositoryKitchen.findById(id).get();
+            BeanUtils.copyProperties(kitchen, kitchenFromRepository, "id");
+            Kitchen kitchenUpdated = repositoryKitchen.save(kitchenFromRepository);
+            return ResponseEntity.ok(kitchenUpdated);
+        } catch (NoSuchElementException e) {
+            LOGGER.error("Update -> NoSuchElementException: ", e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

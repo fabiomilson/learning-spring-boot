@@ -28,6 +28,7 @@ public class Kitchen extends AbstractEntity {
     @Column(name = COLUMN_NAME, nullable = false, unique = true)
     //@JsonIgnore
     //@JsonProperty("title")
+    @Setter
     private String name;
 
     public Kitchen(String name) {
