@@ -4,6 +4,7 @@ package com.learning.springboot.api.controller;
 import com.learning.springboot.domain.model.Kitchen;
 import com.learning.springboot.domain.model.XmlWrapperKitchen;
 import com.learning.springboot.domain.repository.RepositoryKitchen;
+import com.learning.springboot.model.service.RegisterKitchen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -24,16 +25,16 @@ public class ControllerKitchen {
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerKitchen.class);
 
     @Autowired
-    private RepositoryKitchen repositoryKitchen;
+    private RegisterKitchen registerKitchen;
 
     @GetMapping
     public Iterable<Kitchen> findAll() {
-        return repositoryKitchen.findAll();
+        return registerKitchen.findAll();
     }
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
     public XmlWrapperKitchen findAllXml() {
-        return new XmlWrapperKitchen(repositoryKitchen.findAll());
+        return new XmlWrapperKitchen(registerKitchen.findAll());
     }
 
     /**
@@ -45,7 +46,7 @@ public class ControllerKitchen {
 
     @GetMapping("/{id}")
     public ResponseEntity<Kitchen> findById(@PathVariable("id") Integer id) {
-        var kitchen = repositoryKitchen.findById(id).orElseGet(() -> null);
+        var kitchen = registerKitchen.findById(id).orElseGet(() -> null);
 
         //return ResponseEntity.status(HttpStatus.OK).body(kitchen);
         //return ResponseEntity.ok(kitchen);
@@ -65,15 +66,15 @@ public class ControllerKitchen {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Kitchen add(@RequestBody Kitchen kitchen) {
-        return repositoryKitchen.save(kitchen);
+        return registerKitchen.save(kitchen);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Kitchen> update(@PathVariable Integer id, @RequestBody Kitchen kitchen) {
         try {
-            Kitchen kitchenFromRepository = repositoryKitchen.findById(id).get();
+            Kitchen kitchenFromRepository = registerKitchen.findById(id).get();
             BeanUtils.copyProperties(kitchen, kitchenFromRepository, "id");
-            Kitchen kitchenUpdated = repositoryKitchen.save(kitchenFromRepository);
+            Kitchen kitchenUpdated = registerKitchen.save(kitchenFromRepository);
             return ResponseEntity.ok(kitchenUpdated);
         } catch (NoSuchElementException e) {
             LOGGER.error("Update -> NoSuchElementException: ", e);
@@ -84,8 +85,8 @@ public class ControllerKitchen {
     @DeleteMapping("/{id}")
     public ResponseEntity<Kitchen> delete(@PathVariable Integer id){
         try {
-            Kitchen kitchen = repositoryKitchen.findById(id).get();
-            repositoryKitchen.delete(kitchen);
+            Kitchen kitchen = registerKitchen.findById(id).get();
+            registerKitchen.delete(kitchen);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("Update -> DataIntegrityViolationException: ", e);
