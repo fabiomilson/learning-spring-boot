@@ -1,5 +1,8 @@
 package com.learning.springboot.domain.model;
 
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonProperty;
+//import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,6 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor(staticName = "of")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = Kitchen.TABLE_NAME_KITCHEN)
+//@JsonRootName("kitchen")
 public class Kitchen extends AbstractEntity {
 
     public static final String TABLE_NAME_KITCHEN = "KITCHEN";
@@ -21,7 +25,9 @@ public class Kitchen extends AbstractEntity {
     private int id;
 
     @Getter
-    @Column(name = COLUMN_NAME, nullable = false)
+    @Column(name = COLUMN_NAME, nullable = false, unique = true)
+    //@JsonIgnore
+    //@JsonProperty("title")
     private String name;
 
     public Kitchen(String name) {
