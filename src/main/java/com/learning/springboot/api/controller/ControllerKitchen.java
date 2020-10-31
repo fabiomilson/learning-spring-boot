@@ -1,15 +1,15 @@
 package com.learning.springboot.api.controller;
 
 
+import com.learning.springboot.domain.exception.EntityInUseException;
+import com.learning.springboot.domain.exception.EntityNotFoundException;
 import com.learning.springboot.domain.model.Kitchen;
 import com.learning.springboot.domain.model.XmlWrapperKitchen;
-import com.learning.springboot.domain.repository.RepositoryKitchen;
 import com.learning.springboot.model.service.RegisterKitchen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,14 +85,15 @@ public class ControllerKitchen {
     @DeleteMapping("/{id}")
     public ResponseEntity<Kitchen> delete(@PathVariable Integer id){
         try {
-            Kitchen kitchen = registerKitchen.findById(id).get();
-            registerKitchen.delete(kitchen);
+            registerKitchen.delete(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.error("Update -> DataIntegrityViolationException: ", e);
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("EntityNotFoundException", e);
+            return ResponseEntity.notFound().build();
+        } catch (EntityInUseException e) {
+            LOGGER.error("EntityNotFoundException", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
     }
 
 }

@@ -1,8 +1,7 @@
 package com.learning.springboot.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -23,15 +22,23 @@ public class Restaurant extends AbstractEntity {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_ID)
+    @Getter
     private int id;
 
+    @Getter
+    @Setter
     @Column(name = COLUMN_NAME, nullable = false)
     private String name;
 
+    @Getter
+    @Setter
     @Column(name = COLUMN_SHIPPING_FEE, nullable = false)
     private BigDecimal shippingFee;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_kitchen", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Kitchen kitchen;
 }
